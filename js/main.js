@@ -6,81 +6,71 @@ const deleteAll = document.querySelector('.delete_all');
 document.addEventListener('DOMContentLoaded', function(){
     listInit();
     addBtn.addEventListener('click', addItem);
-    
+    itemText.addEventListener('keypress', (e)=>{
+        if(e.keyCode === 13) addItem();
+    });
+    deleteAll.addEventListener('click', ()=>{
+        if(!listArr.length){
+            alert("삭제할 데이터가 없습니다!");
+            return;
+        }
+        if(!confirm("정말 모두 삭제하시겠습니까?")) return;
+        listArr.length = 0;
+        saveArr(listArr);
+        listInit();
+    });
 });
 
-let list = [{
-        text : "텍스트",
-        state : false
-    },{
-        text : "텍스트2",
-        state : true
-    },{
-        text : "텍스트3",
-        state : true
-    },
-];
+let listArr=[];
 
-itemText.addEventListener('keypress', (e)=>{
-    if(e.keyCode === 13) addItem();
-});
+function saveArr(value){
+    localStorage.setItem("list", JSON.stringify(value));
+}
 
 function listInit(){
+    
+    listArr = JSON.parse(localStorage.getItem("list"));
     while(listArea.firstChild){
         listArea.removeChild(listArea.firstChild);
     }
-    if(list.length === 0) {
+    if(!listArr.length) {
         let noData = document.createElement("div");
-        noData.textContent = "목록없음"
+        noData.textContent = "목록없음";
         listArea.appendChild(noData);
         return;
     }
-    list.forEach((item, idx)=>{
+    listArr.forEach((item, idx)=>{
         createItem(item, idx);
     });
 }
 
 function addItem(){
-    if(list.length === 0) {
+    if(!listArr.length) {
         listArea.removeChild(listArea.firstChild);
     }
     let itemTextVal = itemText.value;
     if(itemTextVal){ 
         let newItem = {text : itemTextVal, state : false};
-        list.push(newItem);
+        listArr.push(newItem);
+        createItem(listArr[listArr.length-1], listArr.length-1);
     }
     itemText.value = null;
-    console.log(list)
-    createItem(list[list.length-1], list.length-1)
 }
 
-function clickEvent(listItem, listItemState, listItemDeleteBtn, listItemEditBtn, listItemText, idx){
-
-    listItemState.addEventListener('click', stateChange);
-    listItemText.addEventListener('click', stateChange);
+function clickEvent(itemNow){
+    itemNow.itemState.addEventListener('click', stateChange);
+    itemNow.itemText.addEventListener('click', stateChange);
     function stateChange(){
-        list[idx].state = !list[idx].state;
-        (list[idx].state) ? listItemState.classList.add('on') : listItemState.classList.remove('on');
-        (list[idx].state) ? listItemText.classList.add('on') : listItemText.classList.remove('on');
+        listArr[itemNow.idx].state = !listArr[itemNow.idx].state;
+        (listArr[itemNow.idx].state) ? itemNow.itemState.classList.add('on') : itemNow.itemState.classList.remove('on');
+        (listArr[itemNow.idx].state) ? itemNow.itemText.classList.add('on') : itemNow.itemText.classList.remove('on');       
+        saveArr(listArr);
     }
 
-    listItemDeleteBtn.addEventListener('click', function(){
-        list.splice(idx, 1);
+    itemNow.itemDeleteBtn.addEventListener('click', ()=>{
+        listArr.splice(itemNow.idx, 1);
+        saveArr(listArr);
         listInit();
-    });
-
-    deleteAll.addEventListener('click', ()=>{
-        list.length = 0;
-        listInit();
-    });
-
-    listItemEditBtn.addEventListener('click', function(){
-        var listItemTextEdit = document.querySelector('.text');
-        listItemTextEdit.readOnly = true;
-        console.log(listItemDeleteBtn)
-        console.log(listItemDeleteBtn)
-        listItemDeleteBtn.classList.add('d-none');
-        listItemEditBtn.classList.add('d-none');
     });
 }
 
@@ -113,9 +103,18 @@ function createItem(item, idx){
 
     listItem.appendChild(listItemState);
     listItem.appendChild(listItemText);
-    // listItem.appendChild(listItemEditBtn);
     listItem.appendChild(listItemDeleteBtn);
     listArea.appendChild(listItem);
-    
-    clickEvent(listItem, listItemState, listItemDeleteBtn, listItemEditBtn, listItemText, idx);
+
+    let listItemAll = {
+        idx : idx,
+        item : listItem,
+        itemText : listItemText,
+        itemState : listItemState,
+        itemEditBtn : listItemEditBtn,
+        itemEditIcon : listItemEditIcon,
+        itemDeleteBtn : listItemDeleteBtn,
+        itemDeleteIcon : listItemDeleteIcon
+    }
+    clickEvent(listItemAll);
 }
