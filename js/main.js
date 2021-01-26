@@ -52,6 +52,7 @@ function addItem(){
     if(itemTextVal){ 
         let newItem = {text : itemTextVal, state : false};
         listArr.push(newItem);
+        saveArr(listArr);
         createItem(listArr[listArr.length-1], listArr.length-1);
     }
     itemText.value = null;
@@ -83,6 +84,7 @@ function createItem(item, idx){
     let listItemDeleteBtn = document.createElement('div');
     let listItemDeleteIcon = document.createElement('i');
 
+
     listItem.className = 'item';
 
     listItemText.className = 'text';
@@ -112,9 +114,7 @@ function createItem(item, idx){
         itemText : listItemText,
         itemState : listItemState,
         itemEditBtn : listItemEditBtn,
-        itemEditIcon : listItemEditIcon,
         itemDeleteBtn : listItemDeleteBtn,
-        itemDeleteIcon : listItemDeleteIcon
     }
     clickEvent(listItemAll);
 }
