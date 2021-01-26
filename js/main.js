@@ -1,10 +1,12 @@
 const listArea = document.querySelector('#list');
 const addBtn = document.querySelector('#addBtn');
 const itemText = document.querySelector('#itemText');
+const listFilter = document.querySelector('.listFilter');
 const deleteAll = document.querySelector('.delete_all');
 
 document.addEventListener('DOMContentLoaded', function(){
     listInit();
+    listFilter.addEventListener('click', listFilterItem);
     addBtn.addEventListener('click', addItem);
     itemText.addEventListener('keypress', (e)=>{
         if(e.keyCode === 13) addItem();
@@ -44,13 +46,44 @@ function listInit(){
     });
 }
 
+function listFilterItem(){
+    if(!listFilter.classList.contains('filter')){
+        let cnt=0;
+        listFilter.classList.add('filter');
+        listFilter.textContent = "✓ 모든 LIST 보기";
+
+        listFavArr = JSON.parse(localStorage.getItem("list"));
+        // console.log(listFavArr)
+        while(listArea.firstChild){
+            listArea.removeChild(listArea.firstChild);
+        }
+        listFavArr.forEach((item, idx)=>{
+            if(item.fav) {
+                createItem(item, idx);
+                cnt++;
+            }
+        });
+        if(cnt == 0) {
+            let noData = document.createElement("div");
+            noData.textContent = "중요 LIST 없음";
+            listArea.appendChild(noData);
+            return;
+        }
+    }else{
+        listFilter.classList.remove('filter');
+        listFilter.textContent = "✓ 중요 LIST만 보기";        
+        listInit();
+    }
+
+}
+
 function addItem(){
     if(!listArr.length) {
         listArea.removeChild(listArea.firstChild);
     }
     let itemTextVal = itemText.value;
     if(itemTextVal){ 
-        let newItem = {text : itemTextVal, state : false};
+        let newItem = {text : itemTextVal, state : false, fav : false};
         listArr.push(newItem);
         saveArr(listArr);
         createItem(listArr[listArr.length-1], listArr.length-1);
@@ -73,6 +106,15 @@ function clickEvent(itemNow){
         saveArr(listArr);
         listInit();
     });
+
+    itemNow.itemFavBtn.addEventListener('click', (e)=>{
+        // console.log(itemNow)
+        let favItem = listArr[itemNow.idx];
+        // console.log(favItem)
+        listArr[itemNow.idx].fav = !listArr[itemNow.idx].fav;
+        (listArr[itemNow.idx].fav) ? itemNow.itemFavBtn.classList.add('on') : itemNow.itemFavBtn.classList.remove('on');
+        saveArr(listArr);
+    });
 }
 
 function createItem(item, idx){
@@ -83,6 +125,8 @@ function createItem(item, idx){
     let listItemEditIcon = document.createElement('i');
     let listItemDeleteBtn = document.createElement('div');
     let listItemDeleteIcon = document.createElement('i');
+    let listItemFavBtn = document.createElement('div');
+    let listItemFavIcon = document.createElement('i');
 
 
     listItem.className = 'item';
@@ -103,8 +147,14 @@ function createItem(item, idx){
     listItemDeleteIcon.className = 'far fa-trash-alt';
     listItemDeleteBtn.appendChild(listItemDeleteIcon);
 
+    listItemFavBtn.className = 'fav';
+    listItemFavIcon.className = 'fas fa-star';
+    listItemFavBtn.appendChild(listItemFavIcon);
+    if(item.fav) listItemFavBtn.classList.add('on');
+
     listItem.appendChild(listItemState);
     listItem.appendChild(listItemText);
+    listItem.appendChild(listItemFavBtn);
     listItem.appendChild(listItemDeleteBtn);
     listArea.appendChild(listItem);
 
@@ -115,6 +165,7 @@ function createItem(item, idx){
         itemState : listItemState,
         itemEditBtn : listItemEditBtn,
         itemDeleteBtn : listItemDeleteBtn,
+        itemFavBtn : listItemFavBtn,
     }
     clickEvent(listItemAll);
 }

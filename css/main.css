@@ -65,6 +65,7 @@ button:hover{
 
 .item{
     display: flex;
+    align-items: center;
     width: 100%;
     margin-bottom: 0.5rem;
     line-height: 2rem;
@@ -82,8 +83,7 @@ button:hover{
 }
 
 .state{
-    width: 2rem;
-    height: 2rem;
+    padding:0 0.65rem;
     border-radius: 15rem;
     border: 1px solid #222;
     cursor: pointer;
@@ -91,7 +91,7 @@ button:hover{
 .state.on{
     background: rgb(53, 157, 255);
     color: #fff;
-    border-color: #fff
+    border-color:rgb(53, 157, 255);
 }
 
 .text{
@@ -127,7 +127,16 @@ i{
     color: #222
 }
 
-
+.fav{
+    padding: 0 0.7rem;
+    background: #eee;
+}
+.fav:hover i{
+    color: #222
+}
+.fav.on i{
+    color: rgb(53, 157, 255);
+}
 .delete_all{
     padding:0.5rem;
     border: 1px solid rgb(53, 157, 255);
@@ -141,4 +150,16 @@ i{
 .delete_all:hover{
     background-color: rgb(53, 157, 255);
     color:#fff
+}
+
+.listFilter{
+    margin-bottom:1rem;
+    color:#aaa;
+    font-weight: bold;
+    display:inline-block;
+    cursor: pointer;
+}
+.listFilter:hover{
+    color:rgb(53, 157, 255);
+    text-decoration: underline;
 }
